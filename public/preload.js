@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
   processFile: (filePath) => ipcRenderer.invoke('process-file', filePath),
   generateDocument: (options) => ipcRenderer.invoke('generate-document', options),
+  generatePreview: (options) => ipcRenderer.invoke('generate-preview', options),
   
   // Utility functions
   showItemInFolder: (filePath) => ipcRenderer.invoke('show-item-in-folder', filePath),

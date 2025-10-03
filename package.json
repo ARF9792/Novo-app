@@ -2,6 +2,7 @@
   "name": "contract-generator-desktop",
   "version": "1.0.0",
   "description": "Desktop application for generating contracts from templates",
+  "author": "Contract Generator Team",
   "main": "main.js",
   "homepage": "./",
   "scripts": {
@@ -13,7 +14,12 @@
     "electron-dev": "ELECTRON_IS_DEV=true electron .",
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && npm run electron-dev\"",
     "pack": "electron-builder --dir",
-    "dist": "npm run build && electron-builder"
+    "dist": "npm run build && electron-builder",
+    "build:portable": "npm run build && electron-builder --win portable",
+    "build:zip": "npm run build && electron-builder --win zip",
+    "build:nsis": "npm run build && electron-builder --win nsis",
+    "build:squirrel": "npm run build && electron-builder --win squirrel",
+    "build:all-win": "npm run build && electron-builder --win portable --win zip --win nsis"
   },
   "build": {
     "appId": "com.contractgenerator.desktop",
@@ -29,10 +35,37 @@
       "category": "public.app-category.productivity"
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "publisherName": "Contract Generator",
+      "verifyUpdateCodeSignature": false,
+      "requestedExecutionLevel": "asInvoker",
+      "signAndEditExecutable": false,
+      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Contract Generator",
+      "allowElevation": true,
+      "runAfterFinish": true,
+      "menuCategory": true,
+      "include": "installer.nsh",
+      "warningsAsErrors": false
     },
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "category": "Office"
     }
   },
   "dependencies": {

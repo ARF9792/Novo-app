@@ -9,16 +9,19 @@ let mainWindow;
 
 function createWindow() {
   // Get the correct preload path
-  //const preloadPath = path.join(__dirname, 'public', 'preload.js');
   const isDev = process.env.ELECTRON_IS_DEV === 'true';
-
-const preloadPath = path.join(__dirname, 'preload.js');
+  const preloadPath = path.join(__dirname, 'preload.js');
+  
+  console.log('=== Electron Starting ===');
+  console.log('Is development:', isDev);
   console.log('Preload path:', preloadPath);
   console.log('Preload exists:', fs.existsSync(preloadPath));
+  console.log('__dirname:', __dirname);
 
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    backgroundColor: '#ffffff',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -28,21 +31,49 @@ const preloadPath = path.join(__dirname, 'preload.js');
     show: false // Don't show until ready
   });
 
-  // Check if we're in development or production
- //const isDev = process.env.ELECTRON_IS_DEV === 'true';
-  console.log('Is development:', isDev);
+  console.log('Window created, loading content...');
 
   if (isDev) {
+    console.log('Loading dev URL: http://localhost:3000');
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
   } else {
     // In production, load from build folder
-    mainWindow.loadFile(path.join(__dirname, 'index.html'));
+    const indexPath = path.join(__dirname, 'index.html');
+    console.log('Loading production file:', indexPath);
+    console.log('Index.html exists:', fs.existsSync(indexPath));
+    
+    mainWindow.loadFile(indexPath).catch(err => {
+      console.error('Failed to load index.html:', err);
+      // Try to show error to user
+      mainWindow.show();
+      mainWindow.webContents.executeJavaScript(`
+        document.body.innerHTML = '<div style="font-family: Arial; padding: 40px; text-align: center;">
+          <h1 style="color: red;">Failed to Load Application</h1>
+          <p>Error: ${err.message}</p>
+          <p>Path: ${indexPath}</p>
+        </div>';
+      `);
+    });
   }
 
   // Show window when ready to prevent visual flash
   mainWindow.once('ready-to-show', () => {
+    console.log('Window ready to show');
     mainWindow.show();
+  });
+
+  // Add timeout to force show window if it takes too long
+  setTimeout(() => {
+    if (mainWindow && !mainWindow.isVisible()) {
+      console.log('Force showing window after timeout');
+      mainWindow.show();
+    }
+  }, 5000);
+
+  // Log any load failures
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Page failed to load:', errorCode, errorDescription);
   });
 
   mainWindow.on('closed', () => {
@@ -50,21 +81,67 @@ const preloadPath = path.join(__dirname, 'preload.js');
   });
 }
 
+// Handle app ready with error catching
 app.whenReady().then(() => {
-  createWindow();
+  console.log('=== App Ready ===');
+  console.log('Platform:', process.platform);
+  console.log('App path:', app.getAppPath());
+  console.log('User data:', app.getPath('userData'));
+  
+  try {
+    createWindow();
+  } catch (error) {
+    console.error('Error creating window:', error);
+    // Try to show a basic error dialog
+    dialog.showErrorBox('Startup Error', `Failed to create window: ${error.message}`);
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }
   });
+}).catch(error => {
+  console.error('App failed to ready:', error);
 });
 
 app.on('window-all-closed', () => {
+  console.log('All windows closed');
+  // On macOS, apps typically stay open until explicitly quit
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
+
+// Log uncaught errors
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  dialog.showErrorBox('Application Error', `An error occurred: ${error.message}`);
+});
+
+// Quit when all windows are closed - important for Windows installer
+app.on('before-quit', () => {
+  // Force quit all windows
+  if (mainWindow) {
+    mainWindow.removeAllListeners('close');
+    mainWindow.close();
+  }
+});
+
+// Handle second instance for Windows (prevent multiple instances)
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, focus our window
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
 
 // IPC Handlers
 
@@ -116,6 +193,33 @@ ipcMain.handle('process-file', async (event, filePath) => {
     return { success: true, placeholders };
   } catch (error) {
     console.error('Error processing file:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Generate preview of filled document without saving
+ipcMain.handle('generate-preview', async (event, options) => {
+  const { filePath, values } = options;
+  
+  try {
+    // Read and process the template
+    const content = fs.readFileSync(filePath, 'binary');
+    const zip = new PizZip(content);
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true
+    });
+
+    // Set the data and render
+    doc.render(values);
+
+    // Generate the filled document buffer
+    const buffer = doc.getZip().generate({ type: 'nodebuffer' });
+    
+    // Return the buffer as an array for preview
+    return { success: true, buffer: Array.from(new Uint8Array(buffer)) };
+  } catch (error) {
+    console.error('Error generating preview:', error);
     return { success: false, error: error.message };
   }
 });

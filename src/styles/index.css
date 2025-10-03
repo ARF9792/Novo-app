@@ -1,15 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
+/* Professional base styles */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fb;
+  color: #2d3748;
+}
+
+/* Professional utility classes */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-navy-800 border border-transparent rounded-md shadow-professional hover:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500 transition-all duration-200;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center px-4 py-2.5 text-sm font-medium text-navy-700 bg-white border border-navy-300 rounded-md shadow-professional hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500 transition-all duration-200;
+  }
+  
+  .card-professional {
+    @apply bg-white border border-gray-200 rounded-lg shadow-professional;
+  }
+  
+  .card-professional-hover {
+    @apply bg-white border border-gray-200 rounded-lg shadow-professional hover:shadow-professional-lg hover:border-gray-300 transition-all duration-200;
+  }
+  
+  .input-professional {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-navy-500 focus:border-navy-500 transition-colors duration-200;
+  }
+  
+  .text-heading {
+    @apply font-display font-semibold text-navy-900;
+  }
+  
+  .text-subheading {
+    @apply font-display font-medium text-navy-700;
+  }
+  
+  .text-body {
+    @apply text-gray-700;
+  }
+  
+  .text-caption {
+    @apply text-sm text-gray-500;
+  }
+}
+
+/* Toast notification animations */
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.animate-progress {
+  animation: progress 2s linear forwards;
 }
 
 code {

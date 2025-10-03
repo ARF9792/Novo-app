@@ -1,44 +1,54 @@
-/* This class will be the container for our preview to scope the styles */
+/* Professional document preview styling */
 .docx-preview {
-  background-color: white;
-  padding: 2rem 3rem;
-  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  padding: 3rem 4rem;
+  border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
   overflow-y: auto;
-  max-height: 40rem; /* Limit height and allow scrolling */
+  max-height: 42rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  font-family: 'Inter', 'Calibri', sans-serif;
 }
 
-/* === GENERAL TYPOGRAPHY (Mimicking Word) === */
+/* === Professional Typography === */
 .docx-preview p,
 .docx-preview li {
-  font-family: 'Calibri', 'Carlito', sans-serif; /* Common Word font */
+  font-family: 'Inter', 'Calibri', sans-serif;
   font-size: 11pt;
-  line-height: 1.5;
-  margin-bottom: 0.5rem;
-  color: #222;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  color: #2d3748;
+  font-weight: 400;
 }
 
-/* === HEADINGS === */
+/* === Professional Headings === */
 .docx-preview h1 {
-  font-family: 'Cambria', 'Calisto MT', serif; /* Common Word heading font */
-  font-size: 16pt;
-  color: #333;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
+  font-family: 'Poppins', 'Cambria', serif;
+  font-size: 18pt;
+  font-weight: 600;
+  color: #1a202c;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
 }
 
 .docx-preview h2 {
-  font-family: 'Cambria', 'Calisto MT', serif;
-  font-size: 13pt;
-  color: #444;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
+  font-family: 'Poppins', 'Cambria', serif;
+  font-size: 14pt;
+  font-weight: 600;
+  color: #2d3748;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.025em;
 }
 
 .docx-preview h3 {
-  font-family: 'Cambria', 'Calisto MT', serif;
+  font-family: 'Poppins', 'Cambria', serif;
   font-size: 12pt;
-  color: #555;
+  font-weight: 500;
+  color: #4a5568;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
 }
 
 /* === ALIGNMENT (Mammoth generates these classes) === */
@@ -52,21 +62,36 @@
   text-align: right;
 }
 
-/* === OTHER ELEMENTS === */
+/* === Professional Elements === */
 .docx-preview a {
-  color: #0563c1;
+  color: #4f46e5;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.docx-preview a:hover {
+  color: #4338ca;
+  text-decoration-thickness: 2px;
 }
 
 .docx-preview table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 10pt;
 }
 
 .docx-preview th,
 .docx-preview td {
-  border: 1px solid #ccc;
-  padding: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 12px 16px;
   text-align: left;
+  vertical-align: top;
+}
+
+.docx-preview th {
+  background-color: #f7fafc;
+  font-weight: 600;
+  color: #2d3748;
 }
