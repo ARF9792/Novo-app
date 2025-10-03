@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Desktop application for generating contracts from templates",
   "author": "Contract Generator Team",
-  "main": "main.js",
+  "main": "build/electron.js",
   "homepage": "./",
   "scripts": {
     "start": "react-scripts start",

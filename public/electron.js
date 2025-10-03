@@ -5,6 +5,31 @@ const { exec } = require('child_process');
 const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 
+// Log file for debugging in production
+const logFile = path.join(app.getPath('userData'), 'app.log');
+const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+
+// Override console methods to write to log file in production
+const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+
+console.log = (...args) => {
+  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+  originalConsoleLog(...args);
+  logStream.write(`[LOG ${new Date().toISOString()}] ${message}\n`);
+};
+
+console.error = (...args) => {
+  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+  originalConsoleError(...args);
+  logStream.write(`[ERROR ${new Date().toISOString()}] ${message}\n`);
+};
+
+console.log('=== Application Starting ===');
+console.log('Log file location:', logFile);
+console.log('App path:', app.getAppPath());
+console.log('Platform:', process.platform);
+
 let mainWindow;
 
 function createWindow() {
@@ -68,6 +93,13 @@ function createWindow() {
     if (mainWindow && !mainWindow.isVisible()) {
       console.log('Force showing window after timeout');
       mainWindow.show();
+      // Show error dialog if window still doesn't show
+      dialog.showMessageBox(mainWindow, {
+        type: 'warning',
+        title: 'Loading Issue',
+        message: 'The application took longer than expected to load. Check the log file at: ' + logFile,
+        buttons: ['OK']
+      });
     }
   }, 5000);
 
